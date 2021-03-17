@@ -1,0 +1,20 @@
+body{
+    background-color: antiquewhite;
+}
+
+div{
+    text-align: left;
+    color: black;
+}
+
+h1{
+    text-align: center;
+}
+
+#totalCost{
+    text-align: right;
+}
+
+.highCost {
+    color: red;
+}
