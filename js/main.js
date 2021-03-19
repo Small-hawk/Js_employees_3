@@ -1,4 +1,5 @@
-var data = [{
+'use strict';
+const data = [{
     "first_name": "Conrad",
     "last_name": "Chatfield",
     "email": "cchatfield0@51.la",
@@ -120,16 +121,15 @@ var data = [{
     "photo": "http://dummyimage.com/400x400.jpg/cc0000/ffffff"
 }];
 
-//init the public variables
-var htmlData = "";
-var textForSearch = "";
-
-function loadData(){
-    data.forEach( x => createHtmlComponents(x));
+function loadData(dataForLoad){
+    let htmlData = "";
+    dataForLoad.forEach( x => htmlData += createHtmlComponents(x));
+    pushComponentsHtml(htmlData);
 }
 
 function createHtmlComponents(dataElements){
-    htmlData += `<div class="card text-dark bg-light mb-3 card border-info mb-3" id="dataEmployees">
+    let htmlElement = "";
+    htmlElement += `<div class="card text-dark bg-light mb-3 card border-info mb-3" id="dataEmployees">
                     <div class="row g-0">
                         <div class="col-md-5">
                             <img src="${dataElements.photo}" alt="Pic of ${dataElements.first_name}">
@@ -149,7 +149,7 @@ function createHtmlComponents(dataElements){
                         </div>
                     </div>
                 </div> `;
-    pushComponentsHtml(htmlData);
+    return htmlElement;
 }
 
 function pushComponentsHtml(comp){
@@ -157,61 +157,56 @@ function pushComponentsHtml(comp){
 }
 
 function theSearcher(){
-    htmlData = [];
-    var filteredData = [];
-    textForSearch = document.querySelector('#textToSearch').value;
+    let filteredData = [];
+    let textForSearch = document.querySelector('#textToSearch').value;
 
-    if (textForSearch === ""){
+    if (textForSearch.length == 0){
         alert("You have to write something for search!");
     }
     else{
         filteredData = data.filter( d=>{
             return d.first_name.toLowerCase().includes(textForSearch.toLowerCase()) ||
-                    d.last_name.toLowerCase().includes(textForSearch.toLowerCase()) ||
-                        d.email.toLowerCase().includes(textForSearch.toLowerCase()) ||
-                      d.country.toLowerCase().includes(textForSearch.toLowerCase())
+                d.last_name.toLowerCase().includes(textForSearch.toLowerCase()) ||
+                d.email.toLowerCase().includes(textForSearch.toLowerCase()) ||
+                d.country.toLowerCase().includes(textForSearch.toLowerCase())
         });
-        if(filteredData.length ==0){
-            alert("There is nothing to match. Try again!");
+        if(filteredData.length == 0){
+            alert( "There is nothing to match. Try again!" );
         }
         else{
-            filteredData.forEach( x => createHtmlComponents(x));
+            loadData(filteredData);
             costShow(filteredData);
         }
     }
 }
 
-function initDataOnDom(){
-    htmlData = "";
-    loadData();
-
+function initData(){
+    loadData(data);
     document.querySelector('#totalCost').innerHTML = `Total Cost: `;
-    document.querySelector('#totalCost').classList.remove("highCost");
     document.querySelector('#textToSearch').value = "";
+    removeHighCost();
 }
 
 function costShow(totalCost){
-    var costSallary;
+    let costSallary;
 
     costSallary = totalCost.reduce( (acc, r) => {
-                                                    var x = parseFloat(r.sallary);
-                                                    return acc + x;
-                                                 },0);
-    document.querySelector('#totalCost').innerHTML = `Total Cost: ${costSallary.toFixed(2)}`;
-
-    // The ternary will be used instead of if/else.
-    // if(costSallary >= 5000){
-    //     document.querySelector('#totalCost').classList.add("highCost");
-    // }
-    // else{
-    //     document.querySelector('#totalCost').classList.remove("highCost");
-    // }
-
-    //Ternary:
-    (costSallary >= 5000) ? document.querySelector('#totalCost').classList.add("highCost") : document.querySelector('#totalCost').classList.remove("highCost");
+        let x = parseFloat(r.sallary);
+        return acc + x;
+    },0);
+    document.querySelector('#totalCost').innerHTML = `Total Cost: ${ costSallary.toFixed(2) }`;
+    (costSallary >= 5000) ? setHighCost() : removeHighCost();
 }
 
-loadData();
+function setHighCost(){
+    document.querySelector('#totalCost').classList.add("highCost");
+}
+
+function removeHighCost(){
+    document.querySelector('#totalCost').classList.remove("highCost");
+}
+
+loadData(data);
 
 document.querySelector('#startSearch').addEventListener('click', evt => theSearcher());
-document.querySelector('#refreshButton').addEventListener('click', evt => initDataOnDom());
+document.querySelector('#refreshButton').addEventListener('click', evt => initData());
